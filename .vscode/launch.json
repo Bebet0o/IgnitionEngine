@@ -1,0 +1,29 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "IgnitionEngine (Debug)",
+            "type": "cppvsdbg",             // Pour MSVC (Visual Studio)
+            "request": "launch",
+            "program": "${workspaceFolder}/build/Debug/IgnitionEngine.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/build/Debug",
+            "environment": [],
+            "externalConsole": false
+        },
+        {
+            "name": "IgnitionEngine (MinGW)",
+            "type": "cppdbg",                // Pour gdb/MinGW
+            "request": "launch",
+            "program": "${workspaceFolder}/build/Debug/IgnitionEngine.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/build/Debug",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "gdb.exe"
+        }
+    ]
+}
