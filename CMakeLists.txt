@@ -15,6 +15,7 @@ include_directories(
     libs/imgui/backends
     libs/json
     libs/tinyfiledialogs
+    libs/glm
 )
 
 # Source files
@@ -28,6 +29,8 @@ set(ENGINE_SOURCES
     src/object/Scene.cpp
     src/object/Transform.cpp
     src/object/GameObject.cpp
+    src/object/Mesh.cpp
+    src/object/RendererComponent.cpp
 )
 
 set(IMGUI_SOURCES

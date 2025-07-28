@@ -26,6 +26,94 @@ static InspectorPanel g_InspectorPanel;
 
 static std::string g_LastScenePath = "";
 
+extern GLuint g_DefaultTexture;
+extern GLuint g_DefaultShader;
+
+void CreateDefaultTexture()
+{
+    unsigned char white[4] = { 255, 255, 255, 255 };
+    glGenTextures(1, &g_DefaultTexture);
+    glBindTexture(GL_TEXTURE_2D, g_DefaultTexture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, white);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+GLuint CompileShader(const char* vertexSrc, const char* fragmentSrc)
+{
+    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertexShader, 1, &vertexSrc, nullptr);
+    glCompileShader(vertexShader);
+
+    GLint success;
+    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+    if (!success)
+    {
+        char infoLog[512];
+        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+        std::cerr << "[Vertex Shader] Compile error:\n" << infoLog << std::endl;
+    }
+
+    // Compile fragment shader
+    GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragmentShader, 1, &fragmentSrc, nullptr);
+    glCompileShader(fragmentShader);
+
+    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+    if (!success)
+    {
+        char infoLog[512];
+        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+        std::cerr << "[Fragment Shader] Compile error:\n" << infoLog << std::endl;
+    }
+
+    // Link program
+    GLuint shaderProgram = glCreateProgram();
+    glAttachShader(shaderProgram, vertexShader);
+    glAttachShader(shaderProgram, fragmentShader);
+    glLinkProgram(shaderProgram);
+
+    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+    if (!success)
+    {
+        char infoLog[512];
+        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+        std::cerr << "[Shader Program] Link error:\n" << infoLog << std::endl;
+    }
+
+    // Clean up shaders
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
+
+    return shaderProgram;
+}
+
+// Exemple de shader ultra simple
+const char* defaultVertexShader = R"(
+    #version 330 core
+    layout(location = 0) in vec3 aPos;
+    layout(location = 1) in vec3 aNormal;
+    layout(location = 2) in vec2 aUV;
+    uniform mat4 u_Model;
+    uniform mat4 u_View;
+    uniform mat4 u_Projection;
+    out vec2 vUV;
+    void main() {
+        vUV = aUV;
+        gl_Position = u_Projection * u_View * u_Model * vec4(aPos, 1.0);
+    }
+)";
+const char* defaultFragmentShader = R"(
+    #version 330 core
+    out vec4 FragColor;
+    in vec2 vUV;
+    uniform sampler2D u_Texture;
+    void main() {
+        FragColor = texture(u_Texture, vUV);
+    }
+)";
+
 void ShowMainMenuBar()
 {
     if (ImGui::BeginMainMenuBar())
@@ -234,6 +322,9 @@ int main() {
         return -1;
     }
 
+    CreateDefaultTexture();
+    g_DefaultShader = CompileShader(defaultVertexShader, defaultFragmentShader);
+
     // 5. Setup ImGui
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -261,7 +352,7 @@ int main() {
         // -- PANELS DE L'EDITEUR --
         libraryPanel.Render();
         g_HierarchyPanel.Render();
-        g_ViewportPanel.Render();
+        g_ViewportPanel.Render(&g_Scene);
 
         GameObject* selected = g_HierarchyPanel.GetSelectedObject();
         g_InspectorPanel.SetTarget(selected);
@@ -272,7 +363,7 @@ int main() {
         int display_w, display_h;
         glfwGetFramebufferSize(window, &display_w, &display_h);
         glViewport(0, 0, display_w, display_h);
-        glClearColor(0.13f, 0.14f, 0.16f, 1.0f); // un fond dark stylé
+        glClearColor(0.13f, 0.14f, 0.16f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 

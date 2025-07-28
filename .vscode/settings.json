@@ -62,6 +62,16 @@
         "xmemory": "cpp",
         "xstring": "cpp",
         "xtr1common": "cpp",
-        "xutility": "cpp"
+        "xutility": "cpp",
+        "any": "cpp",
+        "array": "cpp",
+        "codecvt": "cpp",
+        "fstream": "cpp",
+        "map": "cpp",
+        "numeric": "cpp",
+        "ranges": "cpp",
+        "span": "cpp",
+        "valarray": "cpp",
+        "xtree": "cpp"
     }
 }

@@ -8,4 +8,6 @@ struct Transform : public Component {
     Vector3 scale{1,1,1};
 
     std::string GetName() const override { return "Transform"; }
+    bool AllowMultiple() const override { return false; }
+    static bool AllowMultiple_Static() { return false; }
 };

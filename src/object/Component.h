@@ -14,4 +14,7 @@ public:
     virtual void OnStart() {}
     virtual void OnUpdate(float dt) {}
     virtual void OnDestroy() {}
+
+    virtual bool AllowMultiple() const { return false; }
+    static bool AllowMultiple_Static() { return false; }
 };

@@ -1,5 +1,4 @@
 #include "GameObject.h"
-#include "Transform.h"
 
 GameObject::GameObject(const std::string& n)
     : name(n)
@@ -12,14 +11,6 @@ GameObject::~GameObject() {
         comp->OnDestroy();
 }
 
-template<typename T, typename... Args>
-T* GameObject::AddComponent(Args&&... args) {
-    auto comp = std::make_unique<T>(std::forward<Args>(args)...);
-    comp->gameObject = this;
-    T* ptr = comp.get();
-    m_Components.push_back(std::move(comp));
-    return ptr;
-}
 
 template Transform* GameObject::AddComponent<Transform>();
 
